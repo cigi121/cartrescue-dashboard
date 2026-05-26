@@ -4,26 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CartRescue AI - Dashboard</title>
-    <!-- Tailwind CSS for Modern UI -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen">
 
-    <!-- Auth Layer Screen (Login / Signup Popup if not logged in) -->
     <div id="authOverlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 md:p-8 shadow-2xl">
+            
             <div class="flex items-center gap-3 mb-6 justify-center">
                 <div class="bg-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-500/30">
                     <i class="fa-solid fa-basket-shopping text-white text-lg"></i>
                 </div>
                 <span class="text-xl font-bold tracking-tight text-white">CartRescue<span class="text-indigo-500">.ai</span></span>
             </div>
-            <h3 class="text-lg font-bold text-center text-white mb-2">Store Owner Portal</h3>
-            <p class="text-xs text-center text-slate-400 mb-6">Enter your credentials to access your real-time recovery dashboard.</p>
+
+            <div class="flex border-b border-slate-800 mb-6">
+                <button id="tabLogin" onclick="switchTab('login')" class="w-1/2 pb-3 text-sm font-semibold border-b-2 border-indigo-500 text-indigo-400 transition-all cursor-pointer">
+                    Log In
+                </button>
+                <button id="tabSignup" onclick="switchTab('signup')" class="w-1/2 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all cursor-pointer">
+                    Create Account
+                </button>
+            </div>
+            
+            <h3 id="authTitle" class="text-lg font-bold text-center text-white mb-1">Welcome Back</h3>
+            <p id="authSubtitle" class="text-xs text-center text-slate-400 mb-6">Enter your email and password to access your dashboard.</p>
             
             <div class="space-y-4">
                 <div>
@@ -34,16 +41,18 @@
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Password</label>
                     <input type="password" id="authPassword" placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all">
                 </div>
-                <button onclick="handleAuth()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 rounded-xl shadow-lg transition-all text-sm mt-2 cursor-pointer">
-                    Login / Sign Up
+                
+                <button id="btnLogin" onclick="handleLogin()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 rounded-xl shadow-lg transition-all text-sm mt-2 cursor-pointer">
+                    Sign In to Account
+                </button>
+                <button id="btnSignup" onclick="handleSignup()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl shadow-lg transition-all text-sm mt-2 cursor-pointer hidden">
+                    Register New Store
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Main Application Grid -->
     <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar Navigation -->
         <aside class="w-64 bg-slate-950 border-r border-slate-800 p-6 flex flex-col justify-between hidden md:flex">
             <div>
                 <div class="flex items-center gap-3 mb-10">
@@ -63,15 +72,13 @@
                     <div class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-indigo-400" id="userInitial">U</div>
                     <div>
                         <p class="text-sm font-medium text-slate-300" id="userDisplay">Store Owner</p>
-                        <button onclick="handleLogout()" class="text-xs text-red-400 hover:underline block text-left">Log Out</button>
+                        <button onclick="handleLogout()" class="text-xs text-red-400 hover:underline block text-left cursor-pointer">Log Out</button>
                     </div>
                 </div>
             </div>
         </aside>
 
-        <!-- Main Dashboard Content Area -->
         <main class="flex-1 overflow-y-auto p-4 md:p-10">
-            <!-- Header -->
             <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
                 <div>
                     <h1 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Recovery Dashboard</h1>
@@ -82,7 +89,6 @@
                 </button>
             </header>
 
-            <!-- Metrics Grid -->
             <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
                 <div class="bg-slate-950 border border-slate-800 p-6 rounded-2xl relative overflow-hidden group">
                     <div class="flex items-center justify-between mb-4">
@@ -107,7 +113,6 @@
                 </div>
             </section>
 
-            <!-- Data Table -->
             <section class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden">
                 <div class="p-6 border-b border-slate-800 flex items-center justify-between">
                     <h3 class="font-bold text-lg text-white">Live Abandoned Cart Tracking</h3>
@@ -126,15 +131,13 @@
                             </tr>
                         </thead>
                         <tbody id="leads-table-body" class="divide-y divide-slate-900 text-sm font-medium text-slate-300">
-                            <!-- Live rows map here -->
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- Script Modal Popup Container -->
     <div id="scriptModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-all duration-300">
         <div class="bg-slate-950 border border-slate-800 w-full max-w-2xl rounded-3xl p-6 md:p-8 shadow-2xl">
             <div class="flex items-center justify-between mb-6">
@@ -174,33 +177,64 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
     </div>
 
-    <!-- Script Engines -->
     <script>
         // STEP 2: PASTE YOUR ACTUAL SUPABASE CONFIG LINK HERE
-        const SUPABASE_URL = https://fhmrlrnolpcjkpyhnvle.supabase.co/rest/v1/
+        const SUPABASE_URL = https://fhmrlrnolpcjkpyhnvle.supabase.co/rest/v1/ 
         const SUPABASE_KEY = "sb_publishable_22KwKcRawWIjYqUYHm1Pig_R6cqb4Wj"; 
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Authentication Engine Logic (Signup / Login Combined)
-        async function handleAuth() {
+        // Responsive UI Tab Management Logic
+        function switchTab(mode) {
+            const tabLogin = document.getElementById('tabLogin');
+            const tabSignup = document.getElementById('tabSignup');
+            const title = document.getElementById('authTitle');
+            const subtitle = document.getElementById('authSubtitle');
+            const btnLogin = document.getElementById('btnLogin');
+            const btnSignup = document.getElementById('btnSignup');
+
+            if(mode === 'login') {
+                tabLogin.className = "w-1/2 pb-3 text-sm font-semibold border-b-2 border-indigo-500 text-indigo-400 transition-all cursor-pointer text-center";
+                tabSignup.className = "w-1/2 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all cursor-pointer text-center";
+                title.innerText = "Welcome Back";
+                subtitle.innerText = "Enter your email and password to access your dashboard.";
+                btnLogin.classList.remove('hidden');
+                btnSignup.classList.add('hidden');
+            } else {
+                tabLogin.className = "w-1/2 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all cursor-pointer text-center";
+                tabSignup.className = "w-1/2 pb-3 text-sm font-semibold border-b-2 border-emerald-500 text-emerald-400 transition-all cursor-pointer text-center";
+                title.innerText = "Get Started Today";
+                subtitle.innerText = "Create your account credentials to register a new store link.";
+                btnLogin.classList.add('hidden');
+                btnSignup.classList.remove('hidden');
+            }
+        }
+
+        // Logic Engine - Explicit Login Button Action
+        async function handleLogin() {
             const email = document.getElementById('authEmail').value;
             const password = document.getElementById('authPassword').value;
+            if(!email || !password) { alert('Please enter both your email and password.'); return; }
 
-            if(!email || !password) { alert('Please enter both email and password.'); return; }
-
-            // Try to sign in
             let { data, error } = await supabase.auth.signInWithPassword({ email, password });
-            
-            // If sign in fails, automatically attempt to sign them up as a new store owner
-            if (error) {
-                let { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password });
-                if (signUpError) { alert('Auth Error: ' + signUpError.message); return; }
-                alert('Account created successfully! Welcome aboard.');
-            }
+            if (error) { alert('Login Failed: ' + error.message); return; }
             
             checkUser();
         }
 
+        // Logic Engine - Explicit Sign Up Button Action
+        async function handleSignup() {
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            if(!email || !password) { alert('Please enter an email and create a password.'); return; }
+
+            let { data, error } = await supabase.auth.signUp({ email, password });
+            if (error) { alert('Signup Failed: ' + error.message); return; }
+            
+            alert('Registration Successful! Welcome to CartRescue.');
+            checkUser();
+        }
+
+        // System Core State Validation Checker
         async function checkUser() {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
@@ -249,7 +283,7 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('stat-pending').innerText = totalPending;
         }
 
-        // Modal Utility Controls
+        // Modal Component Triggers
         function openModal() {
             const el = document.getElementById('scriptModal');
             el.classList.remove('hidden');
@@ -265,7 +299,6 @@ document.addEventListener("DOMContentLoaded", () => {
             alert('Tracking script copied to clipboard!');
         }
 
-        // Run checking functions on startup
         window.onload = checkUser;
     </script>
 </body>
