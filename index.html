@@ -21,8 +21,8 @@
                 </div>
                 <nav class="space-y-2">
                     <a href="#" class="flex items-center gap-3 px-4 py-3 bg-indigo-600/10 text-indigo-400 rounded-xl font-medium border border-indigo-500/20 transition-all"><i class="fa-solid fa-chart-pie"></i> Overview</a>
-                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-900 hover:text-slate-200 rounded-xl font-medium transition-all"><i class="fa-solid fa-code"></i> Integration Script</a>
-                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-900 hover:text-slate-200 rounded-xl font-medium transition-all"><i class="fa-solid fa-wallet"></i> Billing</a>
+                    <button onclick="openModal()" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-900 hover:text-slate-200 rounded-xl font-medium transition-all text-left"><i class="fa-solid fa-code"></i> Integration Script</button>
+                    <a href="https://stripe.com" target="_blank" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-900 hover:text-slate-200 rounded-xl font-medium transition-all"><i class="fa-solid fa-wallet"></i> Billing</a>
                 </nav>
             </div>
             <div class="border-t border-slate-800 pt-4">
@@ -99,17 +99,16 @@
         </main>
     </div>
 
-    <div id="scriptModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
-        <div class="bg-slate-950 border border-slate-800 w-full max-w-2xl rounded-3xl p-6 md:p-8 transform scale-95 transition-transform duration-300 shadow-2xl">
+    <div id="scriptModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-all duration-300">
+        <div class="bg-slate-950 border border-slate-800 w-full max-w-2xl rounded-3xl p-6 md:p-8 transform scale-95 transition-all duration-300 shadow-2xl">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-code text-indigo-500"></i> Embed Setup Script</h3>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-white text-xl p-1"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white text-xl p-1 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <p class="text-sm text-slate-400 mb-4">Instruct your customers to copy and paste this code injection script right before the closing <code class="bg-slate-900 text-indigo-400 px-1.5 py-0.5 rounded">&lt;/body&gt;</code> tag of their e-commerce or checkout page.</p>
+            <p class="text-sm text-slate-400 mb-4">Instruct your customers to copy and paste this code injection script right before the closing <code class="bg-slate-900 text-indigo-400 px-1.5 py-0.5 rounded">&lt;/body&gt;</code> tag of their checkout page.</p>
             
             <div class="relative bg-slate-900 p-4 rounded-xl border border-slate-800 font-mono text-xs text-slate-300 overflow-x-auto mb-6 max-h-60">
                 <pre id="embedCode"><code>&lt;script&gt;
-// Copy-paste target snippet for client sites
 document.addEventListener("DOMContentLoaded", () => {
     const phoneInput = document.querySelector('input[type="tel"]') || document.querySelector('input[name*="phone"]');
     if (phoneInput) {
@@ -129,23 +128,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 &lt;/script&gt;</code></pre>
-                <button onclick="copyCode()" class="absolute top-3 right-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs px-2.5 py-1.5 rounded-lg font-sans transition-all flex items-center gap-1.5">
+                <button onclick="copyCode()" class="absolute top-3 right-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs px-2.5 py-1.5 rounded-lg font-sans transition-all flex items-center gap-1.5 cursor-pointer">
                     <i class="fa-regular fa-copy"></i> Copy Code
                 </button>
             </div>
             <div class="flex justify-end">
-                <button onclick="closeModal()" class="bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all">Close</button>
+                <button onclick="closeModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all cursor-pointer">Close</button>
             </div>
         </div>
     </div>
 
     <script>
-        // STEP 3: CONFIGURE CLIENT INITIALIZATION VARIABLES
-        const SUPABASE_URL = "YOUR_SUPABASE_URL"; 
+        // STEP 2: PASTE YOUR ACTUAL SUPABASE CONFIG LINK HERE
+        const SUPABASE_URL = https://fhmrlrnolpcjkpyhnvle.supabase.co/rest/v1/ 
         const SUPABASE_KEY = "sb_publishable_22KwKcRawWIjYqUYHm1Pig_R6cqb4Wj"; 
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Fetch Data from Supabase Realtime Storage Engine
         async function fetchMetricsAndLeads() {
             let { data: leads, error } = await supabase
                 .from('leads')
@@ -166,7 +164,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (lead.status === 'Sent') totalSent += 1;
                 if (lead.status === 'Pending') totalPending += 1;
 
-                // Create row element layout template 
                 const row = document.createElement('tr');
                 row.className = "hover:bg-slate-900/40 transition-colors";
                 
@@ -183,35 +180,36 @@ document.addEventListener("DOMContentLoaded", () => {
                 tableBody.appendChild(row);
             });
 
-            // Update UI components dynamically with standard format
             document.getElementById('stat-recovered').innerText = `$${totalRecovered.toFixed(2)}`;
             document.getElementById('stat-sent').innerText = totalSent;
             document.getElementById('stat-pending').innerText = totalPending;
         }
 
-        // Live Subscription Setup to update dashboard UI without page reloads
         supabase
             .channel('schema-db-changes')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, fetchMetricsAndLeads)
             .subscribe();
 
-        // Modal Utility Controls
+        // Modal Utility Controls Fixed & Visual Layer Mappings
         function openModal() {
             const el = document.getElementById('scriptModal');
             el.classList.remove('hidden');
-            setTimeout(() => el.classList.remove('opacity-0'), 10);
+            setTimeout(() => {
+                el.classList.remove('opacity-0');
+                el.firstElementChild.classList.remove('scale-95');
+            }, 10);
         }
         function closeModal() {
             const el = document.getElementById('scriptModal');
             el.classList.add('opacity-0');
+            el.firstElementChild.classList.add('scale-95');
             setTimeout(() => el.classList.add('hidden'), 300);
         }
         function copyCode() {
             navigator.clipboard.writeText(document.getElementById('embedCode').innerText);
-            alert('Code snippet copied to clipboard! Share this with your clients.');
+            alert('Tracking script copied to clipboard!');
         }
 
-        // Initial Page Boot Data Lifecycle Trigger
         window.onload = fetchMetricsAndLeads;
     </script>
 </body>
