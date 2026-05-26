@@ -179,10 +179,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     <script>
         // STEP 2: PASTE YOUR ACTUAL SUPABASE CONFIG LINK HERE
-        const SUPABASE_URL = https://fhmrlrnolpcjkpyhnvle.supabase.co/rest/v1/ 
+        // STEP 2: PASTE YOUR ACTUAL SUPABASE CONFIG LINK HERE
+        const SUPABASE_URL = "https://fhmrlrnolpcjkpyhnvle.supabase.co"; 
         const SUPABASE_KEY = "sb_publishable_22KwKcRawWIjYqUYHm1Pig_R6cqb4Wj"; 
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         // Responsive UI Tab Management Logic
         function switchTab(mode) {
             const tabLogin = document.getElementById('tabLogin');
