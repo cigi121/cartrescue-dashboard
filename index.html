@@ -21,10 +21,10 @@
             </div>
 
             <div class="flex border-b border-slate-800 mb-6">
-                <button id="tabLogin" onclick="switchTab('login')" class="w-1/2 pb-3 text-sm font-semibold border-b-2 border-indigo-500 text-indigo-400 transition-all cursor-pointer">
+                <button id="tabLogin" onclick="switchTab('login')" class="w-1/2 pb-3 text-sm font-semibold border-b-2 border-indigo-500 text-indigo-400 transition-all cursor-pointer text-center">
                     Log In
                 </button>
-                <button id="tabSignup" onclick="switchTab('signup')" class="w-1/2 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all cursor-pointer">
+                <button id="tabSignup" onclick="switchTab('signup')" class="w-1/2 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all cursor-pointer text-center">
                     Create Account
                 </button>
             </div>
@@ -131,7 +131,7 @@
                             </tr>
                         </thead>
                         <tbody id="leads-table-body" class="divide-y divide-slate-900 text-sm font-medium text-slate-300">
-                            </tbody>
+                        </tbody>
                     </table>
                 </div>
             </section>
@@ -178,13 +178,16 @@ document.addEventListener("DOMContentLoaded", () => {
     </div>
 
     <script>
-        // STEP 2: PASTE YOUR ACTUAL SUPABASE CONFIG LINK HERE
-        // STEP 2: PASTE YOUR ACTUAL SUPABASE CONFIG LINK HERE
         const SUPABASE_URL = "https://fhmrlrnolpcjkpyhnvle.supabase.co"; 
         const SUPABASE_KEY = "sb_publishable_22KwKcRawWIjYqUYHm1Pig_R6cqb4Wj"; 
         
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        // Responsive UI Tab Management Logic
+        let supabase;
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        } catch (err) {
+            console.error("Initialization failed:", err);
+        }
+
         function switchTab(mode) {
             const tabLogin = document.getElementById('tabLogin');
             const tabSignup = document.getElementById('tabSignup');
@@ -193,7 +196,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const btnLogin = document.getElementById('btnLogin');
             const btnSignup = document.getElementById('btnSignup');
 
-            if(mode === 'login') {
+            if (mode === 'login') {
                 tabLogin.className = "w-1/2 pb-3 text-sm font-semibold border-b-2 border-indigo-500 text-indigo-400 transition-all cursor-pointer text-center";
                 tabSignup.className = "w-1/2 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all cursor-pointer text-center";
                 title.innerText = "Welcome Back";
@@ -210,34 +213,32 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        // Logic Engine - Explicit Login Button Action
         async function handleLogin() {
-            const email = document.getElementById('authEmail').value;
+            const email = document.getElementById('authEmail').value.trim();
             const password = document.getElementById('authPassword').value;
-            if(!email || !password) { alert('Please enter both your email and password.'); return; }
+            if (!email || !password) { alert('Please enter both your email and password.'); return; }
 
-            let { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
             if (error) { alert('Login Failed: ' + error.message); return; }
             
             checkUser();
         }
 
-        // Logic Engine - Explicit Sign Up Button Action
         async function handleSignup() {
-            const email = document.getElementById('authEmail').value;
+            const email = document.getElementById('authEmail').value.trim();
             const password = document.getElementById('authPassword').value;
-            if(!email || !password) { alert('Please enter an email and create a password.'); return; }
+            if (!email || !password) { alert('Please enter an email and create a password.'); return; }
 
-            let { data, error } = await supabase.auth.signUp({ email, password });
+            const { data, error } = await supabase.auth.signUp({ email, password });
             if (error) { alert('Signup Failed: ' + error.message); return; }
             
             alert('Registration Successful! Welcome to CartRescue.');
             checkUser();
         }
 
-        // System Core State Validation Checker
         async function checkUser() {
-            const { data: { user } } = await supabase.auth.getUser();
+            if (!supabase) return;
+            const { data: { user }, error } = await supabase.auth.getUser();
             if (user) {
                 document.getElementById('authOverlay').classList.add('hidden');
                 document.getElementById('userDisplay').innerText = user.email.split('@')[0];
@@ -249,7 +250,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         async function handleLogout() {
-            await supabase.auth.signOut();
+            await supabase.signOut();
             checkUser();
         }
 
@@ -284,7 +285,6 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('stat-pending').innerText = totalPending;
         }
 
-        // Modal Component Triggers
         function openModal() {
             const el = document.getElementById('scriptModal');
             el.classList.remove('hidden');
