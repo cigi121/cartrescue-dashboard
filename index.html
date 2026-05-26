@@ -250,7 +250,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         async function handleLogout() {
-            await supabase.signOut();
+            await supabase.auth.signOut();
             checkUser();
         }
 
