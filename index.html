@@ -3,35 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CartRescue AI - Authentication</title>
+    <title>CartRescue AI - Log In</title>
+    <!-- Tailwind CSS for Modern UI -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- FontAwesome for Premium Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen flex items-center justify-center p-4">
 
+    <!-- Auth Card Wrapper -->
     <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
         
-        <div class="flex flex-col items-center mb-8">
+        <!-- Logo Branding Header -->
+        <div class="flex flex-col items-center mb-6">
             <div class="bg-indigo-600 p-3 rounded-2xl shadow-lg shadow-indigo-500/20 mb-3">
                 <i class="fa-solid fa-basket-shopping text-white text-2xl"></i>
             </div>
             <span class="text-2xl font-bold tracking-tight text-white">CartRescue<span class="text-indigo-500">.ai</span></span>
         </div>
 
-        <div class="flex border-b border-slate-800 mb-8 relative">
-            <button id="tab-login" onclick="switchAuthMode('login')" class="flex-1 pb-3 text-center text-sm font-semibold transition-all border-b-2 border-indigo-500 text-white cursor-pointer">
-                Log In
-            </button>
-            <button id="tab-signup" onclick="switchAuthMode('signup')" class="flex-1 pb-3 text-center text-sm font-semibold transition-all border-b-2 border-transparent text-slate-400 hover:text-slate-200 cursor-pointer">
-                Create Account
-            </button>
-        </div>
+        <div class="border-b border-slate-800/60 mb-6"></div>
 
+        <!-- Static Header Context Form -->
         <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-5">
             <div>
-                <h2 id="auth-title" class="text-xl font-bold text-white text-center mb-1">Welcome Back</h2>
-                <p id="auth-subtitle" class="text-xs text-slate-400 text-center mb-6">Enter your email and password to access your dashboard.</p>
+                <h2 class="text-xl font-bold text-white text-center mb-1">Welcome Back</h2>
+                <p class="text-xs text-slate-400 text-center mb-6">Enter your credentials to access your client dashboard.</p>
             </div>
 
             <div>
@@ -55,50 +54,15 @@
             </button>
         </form>
 
+        <!-- Status Message Notifications -->
         <p id="status-msg" class="text-center text-xs mt-4 hidden font-medium"></p>
     </div>
 
     <script>
         // Initialize Supabase configuration
-        const SUPABASE_URL ="https://fhmrlrnclpcjkpyhnvle.supabase.co";
-        const SUPABASE_KEY = sb_publishable_22KwKcRawWIjYqUYHm1Pig_R6cqb4Wj
+        const SUPABASE_URL = https://fhmrlrnclpcjkpyhnvle.supabase.co
+        const SUPABASE_KEY = sb_publishable_22KwKcRawWIjYqUYHm1Pig_R6cqb4Wj 
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        // Keep track of current action state
-        let currentMode = 'login';
-
-        // Tab Switch Control Module
-        function switchAuthMode(mode) {
-            currentMode = mode;
-            
-            const tabLogin = document.getElementById('tab-login');
-            const tabSignup = document.getElementById('tab-signup');
-            const title = document.getElementById('auth-title');
-            const subtitle = document.getElementById('auth-subtitle');
-            const submitBtn = document.getElementById('auth-submit-btn');
-            const statusMsg = document.getElementById('status-msg');
-
-            // Hide status messages on switch
-            statusMsg.classList.add('hidden');
-
-            if (mode === 'login') {
-                // UI styles updates for Log In Tab Active
-                tabLogin.className = "flex-1 pb-3 text-center text-sm font-semibold transition-all border-b-2 border-indigo-500 text-white cursor-pointer";
-                tabSignup.className = "flex-1 pb-3 text-center text-sm font-semibold transition-all border-b-2 border-transparent text-slate-400 hover:text-slate-200 cursor-pointer";
-                
-                title.innerText = "Welcome Back";
-                subtitle.innerText = "Enter your email and password to access your dashboard.";
-                submitBtn.innerText = "Sign In to Account";
-            } else {
-                // UI styles updates for Create Account Tab Active
-                tabLogin.className = "flex-1 pb-3 text-center text-sm font-semibold transition-all border-b-2 border-transparent text-slate-400 hover:text-slate-200 cursor-pointer";
-                tabSignup.className = "flex-1 pb-3 text-center text-sm font-semibold transition-all border-b-2 border-indigo-500 text-white cursor-pointer";
-                
-                title.innerText = "Get Started Free";
-                subtitle.innerText = "Set up your brand store dashboard account in seconds.";
-                submitBtn.innerText = "Create Free Account";
-            }
-        }
 
         // Processing Authorization Pipeline Execution
         async function handleAuth(event) {
@@ -114,30 +78,19 @@
             submitBtn.innerText = "Processing...";
             statusMsg.classList.add('hidden');
 
-            if (currentMode === 'login') {
-                // Log in existing account via Supabase
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                
-                if (error) {
-                    showStatus(error.message, 'error');
-                } else {
-                    showStatus('Success! Redirecting to application...', 'success');
-                    // Route user forward to dashboard application file location
-                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
-                }
+            // Log in existing account via Supabase
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            
+            if (error) {
+                showStatus(error.message, 'error');
             } else {
-                // Sign up new user configuration entry point
-                const { data, error } = await supabase.auth.signUp({ email, password });
-                
-                if (error) {
-                    showStatus(error.message, 'error');
-                } else {
-                    showStatus('Registration successful! Please check your email inbox to verify.', 'success');
-                }
+                showStatus('Success! Redirecting to application...', 'success');
+                // Route user forward to dashboard application file location
+                setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
             }
 
             submitBtn.disabled = false;
-            submitBtn.innerText = currentMode === 'login' ? "Sign In to Account" : "Create Free Account";
+            submitBtn.innerText = "Sign In to Account";
         }
 
         // Internal Status Notifications Helper
