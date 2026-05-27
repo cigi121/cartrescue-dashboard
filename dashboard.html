@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CartRescue AI - Dashboard Portal</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen">
+
+    <!-- OVERLAY SHUTDOWN BLOCKER (Locks application features if expired) -->
+    <div id="lockout-screen" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl p-6 text-center shadow-2xl relative">
+            <div class="w-16 h-16 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h2 class="text-xl font-bold text-white mb-2">Your Active Plan Has Expired</h2>
+            <p class="text-xs text-slate-400 mb-6">Your real-time text tracking pipeline has been paused. Select a flexible billing option below to unlock your features and resume recovering lost e-commerce checkout sales.</p>
+            <div class="space-y-3">
+                <button onclick="checkoutPlan('1 Month')" class="w-full bg-indigo-600 hover:bg-indigo-500 py-3 rounded-xl text-xs font-bold transition-all flex justify-between px-4"><span>Monthly Plan</span> <span>$99/mo</span></button>
+                <button onclick="checkoutPlan('6 Months')" class="w-full bg-slate-800 hover:bg-slate-700 py-3 rounded-xl text-xs font-bold transition-all flex justify-between px-4 border border-slate-700"><span>6 Months (Save 15%)</span> <span>$499</span></button>
+                <button onclick="checkoutPlan('12 Months')" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:opacity-90 py-3 rounded-xl text-xs font-bold transition-all flex justify-between px-4 shadow-lg shadow-indigo-600/20"><span>12 Months (Best Value)</span> <span>$899</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PERSISTENT EXPIRATION BANNER WARNING POPUP (Triggers within 7 days of expiration) -->
+    <div id="warning-popup" class="bg-gradient-to-r from-amber-500/10 via-amber-600/10 to-transparent border-b border-amber-500/20 px-6 py-3 items-center justify-between gap-4 hidden">
+        <div class="flex items-center gap-3">
+            <i class="fa-solid fa-triangle-exclamation text-amber-400 animate-pulse"></i>
+            <p class="text-xs font-medium text-amber-200">Attention: Your account subscription plan is running low and expires in <span id="days-count" class="font-bold underline">X days</span>. Renew your license tracking keys to prevent service interruption.</p>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="triggerPaywallSelection()" class="bg-amber-500 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs hover:bg-amber-400 transition-all cursor-pointer shadow-sm">Renew Now</button>
+        </div>
+    </div>
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Navigation Layout -->
+        <aside class="w-64 bg-slate-950 border-r border-slate-800 p-6 flex flex-col justify-between hidden md:flex">
+            <div>
+                <div class="flex items-center gap-3 mb-10">
+                    <div class="bg-indigo-600 p-2 rounded-xl"><i class="fa-solid fa-basket-shopping text-white"></i></div>
+                    <span class="text-xl font-bold text-white">CartRescue<span class="text-indigo-500">.ai</span></span>
+                </div>
+                <nav class="space-y-2">
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 bg-indigo-600/10 text-indigo-400 rounded-xl font-medium border border-indigo-500/20"><i class="fa-solid fa-chart-pie"></i> Overview</a>
+                    <button onclick="triggerPaywallSelection()" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-900 hover:text-slate-200 rounded-xl font-medium transition-all cursor-pointer"><i class="fa-solid fa-credit-card"></i> Manage Subscriptions</button>
+                    <button onclick="logout()" class="w-full flex items-center gap-3 px-4 py-3 text-rose-400 hover:bg-rose-500/10 rounded-xl font-medium transition-all cursor-pointer mt-8"><i class="fa-solid fa-power-off"></i> Log Out</button>
+                </nav>
+            </div>
+            <div class="border-t border-slate-800 pt-4">
+                <p class="text-xs text-slate-500">Logged in as:</p>
+                <p id="user-display-email" class="text-xs font-semibold text-slate-300 truncate">...</p>
+            </div>
+        </aside>
+
+        <!-- Metrics Dashboard Panel View -->
+        <main id="app-workspace" class="flex-1 overflow-y-auto p-6 md:p-10">
+            <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Recovery Core Dashboard</h1>
+                    <p class="text-sm text-slate-400 mt-1">Live background transaction monitoring loops.</p>
+                </div>
+            </header>
+
+            <!-- Dashboard Analytics Cards System -->
+            <section class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+                <div class="bg-slate-950 border border-slate-800/80 p-6 rounded-2xl">
+                    <p class="text-xs font-semibold text-slate-400 tracking-wider uppercase mb-2">Recovered Sales</p>
+                    <h2 class="text-3xl font-black text-emerald-400">$1,432.50</h2>
+                </div>
+                <div class="bg-slate-950 border border-slate-800/80 p-6 rounded-2xl">
+                    <p class="text-xs font-semibold text-slate-400 tracking-wider uppercase mb-2">Automated Texts Fired</p>
+                    <h2 class="text-3xl font-black text-white">42</h2>
+                </div>
+                <div class="bg-slate-950 border border-slate-800/80 p-6 rounded-2xl">
+                    <p class="text-xs font-semibold text-slate-400 tracking-wider uppercase mb-2">Active Web Script Hook</p>
+                    <h2 class="text-3xl font-black text-indigo-400">Connected</h2>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const SUPABASE_URL = https://fhmrlrnolpcjkpyhnvle.supabase.co; 
+        const SUPABASE_KEY = sb_publishable_22KwKcRawWIjYqUYHm1Pig_R6cqb4Wj; 
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function enforceSubscriptionLifecycle() {
+            const { data: { user }, error: authErr } = await supabase.auth.getUser();
+            
+            // Protect file endpoint route by sending logged out users back to landing
+            if (!user || authErr) { window.location.href = 'index.html'; return; }
+            document.getElementById('user-display-email').innerText = user.email;
+
+            // Query dynamic profile timestamp statuses
+            const { data: profile, error: profErr } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', user.id)
+                .single();
+
+            if (profErr || !profile) return;
+
+            const expiryDate = new Date(profile.plan_expires_at);
+            const today = new Date();
+            
+            // Calculate time differentials
+            const timeDifference = expiryDate.getTime() - today.getTime();
+            const daysRemaining = Math.ceil(timeDifference / (1000 * 365 * 24 * 60 * 60 / 365)); 
+
+            if (daysRemaining <= 0) {
+                // LOCK ACCOUNT METRICS COMPLETELY IF OUT OF TRIAL/PLAN TIMELINES
+                document.getElementById('lockout-screen').classList.remove('hidden');
+                document.getElementById('app-workspace').style.pointerEvents = 'none';
+                document.getElementById('app-workspace').style.filter = 'blur(4px)';
+            } else if (daysRemaining <= 7) {
+                // ACTIVATE INLINE ADVANCE UPSELL NOTICE POPUP WARNING
+                const warningBanner = document.getElementById('warning-popup');
+                warningBanner.classList.remove('hidden');
+                warningBanner.classList.add('flex');
+                document.getElementById('days-count').innerText = `${daysRemaining} days`;
+            }
+        }
+
+        function triggerPaywallSelection() {
+            // Un-hide the billing modal template selection for current sessions
+            document.getElementById('lockout-screen').classList.remove('hidden');
+        }
+
+        function checkoutPlan(tierName) {
+            alert(`Redirecting to Stripe payment gateway link configured for the [${tierName}] package subscription module...`);
+            // Example replacement code logic hook: window.location.href = 'https://buy.stripe.com/your_unique_product_id';
+        }
+
+        async function logout() {
+            await supabase.auth.signOut();
+            window.location.href = 'index.html';
+        }
+
+        window.onload = enforceSubscriptionLifecycle;
+    </script>
+</body>
+</html>
