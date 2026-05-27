@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CartRescue AI - Log In</title>
+    <title>CartRescue AI - Dashboard</title>
     <!-- Tailwind CSS for Modern UI -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome for Premium Icons -->
@@ -11,100 +11,219 @@
     <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen flex items-center justify-center p-4">
+<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen">
 
-    <!-- Auth Card Wrapper -->
-    <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
-        
-        <!-- Logo Branding Header -->
-        <div class="flex flex-col items-center mb-6">
-            <div class="bg-indigo-600 p-3 rounded-2xl shadow-lg shadow-indigo-500/20 mb-3">
-                <i class="fa-solid fa-basket-shopping text-white text-2xl"></i>
-            </div>
-            <span class="text-2xl font-bold tracking-tight text-white">CartRescue<span class="text-indigo-500">.ai</span></span>
-        </div>
-
-        <div class="border-b border-slate-800/60 mb-6"></div>
-
-        <!-- Static Header Context Form -->
-        <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-5">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-slate-950 border-r border-slate-800 p-6 flex flex-col justify-between hidden md:flex">
             <div>
-                <h2 class="text-xl font-bold text-white text-center mb-1">Welcome Back</h2>
-                <p class="text-xs text-slate-400 text-center mb-6">Enter your credentials to access your client dashboard.</p>
+                <div class="flex items-center gap-3 mb-10">
+                    <div class="bg-indigo-600 p-2.5 rounded-xl shadow-lg shadow-indigo-500/30">
+                        <i class="fa-solid fa-basket-shopping text-white text-xl"></i>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">CartRescue<span class="text-indigo-500">.ai</span></span>
+                </div>
+                <nav class="space-y-2">
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 bg-indigo-600/10 text-indigo-400 rounded-xl font-medium border border-indigo-500/20 transition-all"><i class="fa-solid fa-chart-pie"></i> Overview</a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-900 hover:text-slate-200 rounded-xl font-medium transition-all"><i class="fa-solid fa-code"></i> Integration Script</a>
+                    <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-900 hover:text-slate-200 rounded-xl font-medium transition-all"><i class="fa-solid fa-wallet"></i> Billing</a>
+                </nav>
             </div>
-
-            <div>
-                <label class="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">Email Address</label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500"><i class="fa-regular fa-envelope"></i></span>
-                    <input type="email" id="auth-email" required placeholder="name@store.com" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all">
+            <div class="border-t border-slate-800 pt-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-indigo-400">U</div>
+                    <div>
+                        <p class="text-sm font-medium text-slate-300">Store Owner</p>
+                        <p class="text-xs text-slate-500">Premium Plan</p>
+                    </div>
                 </div>
             </div>
+        </aside>
 
-            <div>
-                <label class="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">Password</label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500"><i class="fa-solid fa-lock"></i></span>
-                    <input type="password" id="auth-password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all">
+        <!-- Main Dashboard Content Area -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-10">
+            <!-- Header -->
+            <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Recovery Dashboard</h1>
+                    <p class="text-sm text-slate-400 mt-1">Real-time revenue being saved by your automated SMS workflows.</p>
                 </div>
-            </div>
+                <button onclick="openModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 py-3 rounded-xl shadow-lg shadow-indigo-600/20 active:scale-95 transition-all text-sm flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-code"></i> Get Tracking Code
+                </button>
+            </header>
 
-            <button type="submit" id="auth-submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-indigo-600/20 active:scale-[0.98] transition-all text-sm cursor-pointer mt-2">
-                Sign In to Account
-            </button>
-        </form>
+            <!-- Grid Metrics System -->
+            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+                <div class="bg-slate-950 border border-slate-800/80 p-6 rounded-2xl relative overflow-hidden group">
+                    <div class="absolute -right-4 -bottom-4 text-emerald-500/5 text-8xl font-bold group-hover:scale-110 transition-transform duration-500"><i class="fa-solid fa-dollar-sign"></i></div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-sm font-semibold text-slate-400 tracking-wider uppercase">Recovered Revenue</span>
+                        <span class="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-xl text-xs font-bold"><i class="fa-solid fa-arrow-trend-up"></i> +14.2%</span>
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-black text-white" id="stat-recovered">$0.00</h2>
+                </div>
+                <div class="bg-slate-950 border border-slate-800/80 p-6 rounded-2xl relative overflow-hidden group">
+                    <div class="absolute -right-4 -bottom-4 text-indigo-500/5 text-8xl font-bold group-hover:scale-110 transition-transform duration-500"><i class="fa-solid fa-message"></i></div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-sm font-semibold text-slate-400 tracking-wider uppercase">SMS Messages Sent</span>
+                        <span class="p-2.5 bg-indigo-500/10 text-indigo-400 rounded-xl text-xs font-bold">98% Open Rate</span>
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-black text-white" id="stat-sent">0</h2>
+                </div>
+                <div class="bg-slate-950 border border-slate-800/80 p-6 rounded-2xl relative overflow-hidden group sm:col-span-2 lg:col-span-1">
+                    <div class="absolute -right-4 -bottom-4 text-amber-500/5 text-8xl font-bold group-hover:scale-110 transition-transform duration-500"><i class="fa-solid fa-clock"></i></div>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-sm font-semibold text-slate-400 tracking-wider uppercase">Pending Carts</span>
+                        <span class="p-2.5 bg-amber-500/10 text-amber-400 rounded-xl text-xs font-bold">Waiting 30m</span>
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-black text-white" id="stat-pending">0</h2>
+                </div>
+            </section>
 
-        <!-- Status Message Notifications -->
-        <p id="status-msg" class="text-center text-xs mt-4 hidden font-medium"></p>
+            <!-- Live Recovered Activity Feed Table -->
+            <section class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden">
+                <div class="p-6 border-b border-slate-800 flex items-center justify-between">
+                    <h3 class="font-bold text-lg text-white">Live Abandoned Cart Tracking</h3>
+                    <span class="flex items-center gap-2 text-xs bg-slate-900 border border-slate-800 text-slate-400 px-3 py-1.5 rounded-full">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Streaming Live Data
+                    </span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-xs font-semibold text-slate-400 tracking-wider uppercase bg-slate-900/50">
+                                <th class="p-4">Customer Phone</th>
+                                <th class="p-4">Cart Value</th>
+                                <th class="p-4">Status</th>
+                                <th class="p-4">Captured At</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leads-table-body" class="divide-y divide-slate-900 text-sm font-medium text-slate-300">
+                            <!-- Dynamic data populates here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
     </div>
 
+    <!-- Integration Code Modal Popup -->
+    <div id="scriptModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-slate-950 border border-slate-800 w-full max-w-2xl rounded-3xl p-6 md:p-8 transform scale-95 transition-transform duration-300 shadow-2xl">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-code text-indigo-500"></i> Embed Setup Script</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white text-xl p-1"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-sm text-slate-400 mb-4">Instruct your customers to copy and paste this code injection script right before the closing <code class="bg-slate-900 text-indigo-400 px-1.5 py-0.5 rounded">&lt;/body&gt;</code> tag of their e-commerce or checkout page.</p>
+            
+            <div class="relative bg-slate-900 p-4 rounded-xl border border-slate-800 font-mono text-xs text-slate-300 overflow-x-auto mb-6 max-h-60">
+                <pre id="embedCode"><code>&lt;script&gt;
+// Copy-paste target snippet for client sites
+document.addEventListener("DOMContentLoaded", () => {
+    const phoneInput = document.querySelector('input[type="tel"]') || document.querySelector('input[name*="phone"]');
+    if (phoneInput) {
+        phoneInput.addEventListener("blur", async () => {
+            if (phoneInput.value.length > 5) {
+                await fetch('YOUR_DEPLOYED_APP_URL/api/capture', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        store: window.location.hostname,
+                        phone: phoneInput.value,
+                        value: document.querySelector('[class*="total"], [id*="total"]')?.innerText || "$49.00"
+                    })
+                });
+            }
+        });
+    }
+});
+&lt;/script&gt;</code></pre>
+                <button onclick="copyCode()" class="absolute top-3 right-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs px-2.5 py-1.5 rounded-lg font-sans transition-all flex items-center gap-1.5">
+                    <i class="fa-regular fa-copy"></i> Copy Code
+                </button>
+            </div>
+            <div class="flex justify-end">
+                <button onclick="closeModal()" class="bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Architecture and Data Synchronization Logic -->
     <script>
-        // Initialize Supabase configuration
-        const SUPABASE_URL = https://fhmrlrnclpcjkpyhnvle.supabase.co
-        const SUPABASE_KEY = sb_publishable_22KwKcRawWIjYqUYHm1Pig_R6cqb4Wj 
+        // STEP 3: CONFIGURE CLIENT INITIALIZATION VARIABLES
+        const SUPABASE_URL = https://fhmrlrnolpcjkpyhnvle.supabase.co; 
+        const SUPABASE_KEY = sb_publishable_22KwKcRawWIjYqUYHm1Pig_R6cqb4Wj; 
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Processing Authorization Pipeline Execution
-        async function handleAuth(event) {
-            event.preventDefault();
-            
-            const email = document.getElementById('auth-email').value;
-            const password = document.getElementById('auth-password').value;
-            const statusMsg = document.getElementById('status-msg');
-            const submitBtn = document.getElementById('auth-submit-btn');
+        // Fetch Data from Supabase Realtime Storage Engine
+        async function fetchMetricsAndLeads() {
+            let { data: leads, error } = await supabase
+                .from('leads')
+                .select('*')
+                .order('created_at', { ascending: false });
 
-            // Set Loading state
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Processing...";
-            statusMsg.classList.add('hidden');
+            if (error) { console.error('Error getting data:', error); return; }
 
-            // Log in existing account via Supabase
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-            
-            if (error) {
-                showStatus(error.message, 'error');
-            } else {
-                showStatus('Success! Redirecting to application...', 'success');
-                // Route user forward to dashboard application file location
-                setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
-            }
+            const tableBody = document.getElementById('leads-table-body');
+            tableBody.innerHTML = '';
 
-            submitBtn.disabled = false;
-            submitBtn.innerText = "Sign In to Account";
+            let totalRecovered = 0;
+            let totalSent = 0;
+            let totalPending = 0;
+
+            leads.forEach(lead => {
+                if (lead.status === 'Recovered') totalRecovered += Number(lead.cart_value || 0);
+                if (lead.status === 'Sent') totalSent += 1;
+                if (lead.status === 'Pending') totalPending += 1;
+
+                // Create row element layout template 
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-900/40 transition-colors";
+                
+                let badgeClass = "bg-amber-500/10 text-amber-400";
+                if (lead.status === 'Recovered') badgeClass = "bg-emerald-500/10 text-emerald-400";
+                if (lead.status === 'Sent') badgeClass = "bg-indigo-500/10 text-indigo-400";
+
+                row.innerHTML = `
+                    <td class="p-4 font-mono font-semibold">${lead.customer_phone}</td>
+                    <td class="p-4 text-white">$${Number(lead.cart_value).toFixed(2)}</td>
+                    <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeClass}">${lead.status}</span></td>
+                    <td class="p-4 text-xs text-slate-500">${new Date(lead.created_at).toLocaleString()}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            // Update UI components dynamically with standard format
+            document.getElementById('stat-recovered').innerText = `$${totalRecovered.toFixed(2)}`;
+            document.getElementById('stat-sent').innerText = totalSent;
+            document.getElementById('stat-pending').innerText = totalPending;
         }
 
-        // Internal Status Notifications Helper
-        function showStatus(msg, type) {
-            const statusMsg = document.getElementById('status-msg');
-            statusMsg.innerText = msg;
-            statusMsg.classList.remove('hidden');
-            
-            if (type === 'error') {
-                statusMsg.className = "text-center text-xs mt-4 font-medium text-rose-400 bg-rose-500/10 py-2.5 px-4 rounded-xl border border-rose-500/20";
-            } else {
-                statusMsg.className = "text-center text-xs mt-4 font-medium text-emerald-400 bg-emerald-500/10 py-2.5 px-4 rounded-xl border border-emerald-500/20";
-            }
+        // Live Subscription Setup to update dashboard UI without page reloads
+        supabase
+            .channel('schema-db-changes')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, fetchMetricsAndLeads)
+            .subscribe();
+
+        // Modal Utility Controls
+        function openModal() {
+            const el = document.getElementById('scriptModal');
+            el.classList.remove('hidden');
+            setTimeout(() => el.classList.remove('opacity-0'), 10);
         }
+        function closeModal() {
+            const el = document.getElementById('scriptModal');
+            el.classList.add('opacity-0');
+            setTimeout(() => el.classList.add('hidden'), 300);
+        }
+        function copyCode() {
+            navigator.clipboard.writeText(document.getElementById('embedCode').innerText);
+            alert('Code snippet copied to clipboard! Share this with your clients.');
+        }
+
+        // Initial Page Boot Data Lifecycle Trigger
+        window.onload = fetchMetricsAndLeads;
     </script>
 </body>
 </html>
