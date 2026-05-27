@@ -3,304 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CartRescue AI - Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>CartRescue AI - Authentication</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen">
+<body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen flex items-center justify-center p-4">
 
-    <div id="authOverlay" class="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 md:p-8 shadow-2xl">
-            
-            <div class="flex items-center gap-3 mb-6 justify-center">
-                <div class="bg-indigo-600 p-2 rounded-xl shadow-lg shadow-indigo-500/30">
-                    <i class="fa-solid fa-basket-shopping text-white text-lg"></i>
-                </div>
-                <span class="text-xl font-bold tracking-tight text-white">CartRescue<span class="text-indigo-500">.ai</span></span>
+    <div class="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
+        
+        <div class="flex flex-col items-center mb-8">
+            <div class="bg-indigo-600 p-3 rounded-2xl shadow-lg shadow-indigo-500/20 mb-3">
+                <i class="fa-solid fa-basket-shopping text-white text-2xl"></i>
             </div>
-
-            <div class="flex border-b border-slate-800 mb-6">
-                <button id="tabLogin" onclick="switchTab('login')" class="w-1/2 pb-3 text-sm font-semibold border-b-2 border-indigo-500 text-indigo-400 transition-all cursor-pointer text-center">
-                    Log In
-                </button>
-                <button id="tabSignup" onclick="switchTab('signup')" class="w-1/2 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all cursor-pointer text-center">
-                    Create Account
-                </button>
-            </div>
-            
-            <h3 id="authTitle" class="text-lg font-bold text-center text-white mb-1">Welcome Back</h3>
-            <p id="authSubtitle" class="text-xs text-center text-slate-400 mb-6">Enter your email and password to access your dashboard.</p>
-            
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Email Address</label>
-                    <input type="email" id="authEmail" placeholder="name@store.com" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-400 mb-1">Password</label>
-                    <input type="password" id="authPassword" placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 transition-all">
-                </div>
-                
-                <button id="btnLogin" onclick="handleLogin()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 rounded-xl shadow-lg transition-all text-sm mt-2 cursor-pointer">
-                    Sign In to Account
-                </button>
-                <button id="btnSignup" onclick="handleSignup()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl shadow-lg transition-all text-sm mt-2 cursor-pointer hidden">
-                    Register New Store
-                </button>
-            </div>
+            <span class="text-2xl font-bold tracking-tight text-white">CartRescue<span class="text-indigo-500">.ai</span></span>
         </div>
-    </div>
 
-    <div class="flex h-screen overflow-hidden">
-        <aside class="w-64 bg-slate-950 border-r border-slate-800 p-6 flex flex-col justify-between hidden md:flex">
+        <div class="flex border-b border-slate-800 mb-8 relative">
+            <button id="tab-login" onclick="switchAuthMode('login')" class="flex-1 pb-3 text-center text-sm font-semibold transition-all border-b-2 border-indigo-500 text-white cursor-pointer">
+                Log In
+            </button>
+            <button id="tab-signup" onclick="switchAuthMode('signup')" class="flex-1 pb-3 text-center text-sm font-semibold transition-all border-b-2 border-transparent text-slate-400 hover:text-slate-200 cursor-pointer">
+                Create Account
+            </button>
+        </div>
+
+        <form id="auth-form" onsubmit="handleAuth(event)" class="space-y-5">
             <div>
-                <div class="flex items-center gap-3 mb-10">
-                    <div class="bg-indigo-600 p-2.5 rounded-xl shadow-lg shadow-indigo-500/30">
-                        <i class="fa-solid fa-basket-shopping text-white text-xl"></i>
-                    </div>
-                    <span class="text-xl font-bold tracking-tight text-white">CartRescue<span class="text-indigo-500">.ai</span></span>
-                </div>
-                <nav class="space-y-2">
-                    <a href="#" class="flex items-center gap-3 px-4 py-3 bg-indigo-600/10 text-indigo-400 rounded-xl font-medium border border-indigo-500/20 transition-all"><i class="fa-solid fa-chart-pie"></i> Overview</a>
-                    <button onclick="openModal()" class="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-900 hover:text-slate-200 rounded-xl font-medium transition-all text-left cursor-pointer"><i class="fa-solid fa-code"></i> Integration Script</button>
-                    <a href="https://stripe.com" target="_blank" class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:bg-slate-900 hover:text-slate-200 rounded-xl font-medium transition-all"><i class="fa-solid fa-wallet"></i> Billing</a>
-                </nav>
+                <h2 id="auth-title" class="text-xl font-bold text-white text-center mb-1">Welcome Back</h2>
+                <p id="auth-subtitle" class="text-xs text-slate-400 text-center mb-6">Enter your email and password to access your dashboard.</p>
             </div>
-            <div class="border-t border-slate-800 pt-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-indigo-400" id="userInitial">U</div>
-                    <div>
-                        <p class="text-sm font-medium text-slate-300" id="userDisplay">Store Owner</p>
-                        <button onclick="handleLogout()" class="text-xs text-red-400 hover:underline block text-left cursor-pointer">Log Out</button>
-                    </div>
-                </div>
-            </div>
-        </aside>
 
-        <main class="flex-1 overflow-y-auto p-4 md:p-10">
-            <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
-                <div>
-                    <h1 class="text-2xl md:text-3xl font-extrabold text-white tracking-tight">Recovery Dashboard</h1>
-                    <p class="text-sm text-slate-400 mt-1">Real-time revenue being saved by your automated SMS workflows.</p>
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">Email Address</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500"><i class="fa-regular fa-envelope"></i></span>
+                    <input type="email" id="auth-email" required placeholder="name@store.com" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all">
                 </div>
-                <button onclick="openModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 py-3 rounded-xl shadow-lg shadow-indigo-600/20 active:scale-95 transition-all text-sm flex items-center justify-center gap-2 cursor-pointer">
-                    <i class="fa-solid fa-code"></i> Get Tracking Code
-                </button>
-            </header>
-
-            <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-                <div class="bg-slate-950 border border-slate-800 p-6 rounded-2xl relative overflow-hidden group">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-sm font-semibold text-slate-400 tracking-wider uppercase">Recovered Revenue</span>
-                        <span class="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-xl text-xs font-bold"><i class="fa-solid fa-arrow-trend-up"></i> +14.2%</span>
-                    </div>
-                    <h2 class="text-3xl md:text-4xl font-black text-white" id="stat-recovered">$0.00</h2>
-                </div>
-                <div class="bg-slate-950 border border-slate-800 p-6 rounded-2xl relative overflow-hidden group">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-sm font-semibold text-slate-400 tracking-wider uppercase">SMS Messages Sent</span>
-                        <span class="p-2.5 bg-indigo-500/10 text-indigo-400 rounded-xl text-xs font-bold">98% Open Rate</span>
-                    </div>
-                    <h2 class="text-3xl md:text-4xl font-black text-white" id="stat-sent">0</h2>
-                </div>
-                <div class="bg-slate-950 border border-slate-800 p-6 rounded-2xl relative overflow-hidden group sm:col-span-2 lg:col-span-1">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-sm font-semibold text-slate-400 tracking-wider uppercase">Pending Carts</span>
-                        <span class="p-2.5 bg-amber-500/10 text-amber-400 rounded-xl text-xs font-bold">Waiting 30m</span>
-                    </div>
-                    <h2 class="text-3xl md:text-4xl font-black text-white" id="stat-pending">0</h2>
-                </div>
-            </section>
-
-            <section class="bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden">
-                <div class="p-6 border-b border-slate-800 flex items-center justify-between">
-                    <h3 class="font-bold text-lg text-white">Live Abandoned Cart Tracking</h3>
-                    <span class="flex items-center gap-2 text-xs bg-slate-900 border border-slate-800 text-slate-400 px-3 py-1.5 rounded-full">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Streaming Live Data
-                    </span>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="border-b border-slate-800 text-xs font-semibold text-slate-400 tracking-wider uppercase bg-slate-900/50">
-                                <th class="p-4">Customer Phone</th>
-                                <th class="p-4">Cart Value</th>
-                                <th class="p-4">Status</th>
-                                <th class="p-4">Captured At</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leads-table-body" class="divide-y divide-slate-900 text-sm font-medium text-slate-300">
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <div id="scriptModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-all duration-300">
-        <div class="bg-slate-950 border border-slate-800 w-full max-w-2xl rounded-3xl p-6 md:p-8 shadow-2xl">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-code text-indigo-500"></i> Embed Setup Script</h3>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-white text-xl p-1 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <p class="text-sm text-slate-400 mb-4">Copy and paste this code injection script right before the closing <code class="bg-slate-900 text-indigo-400 px-1.5 py-0.5 rounded">&lt;/body&gt;</code> tag of your checkout page.</p>
-            
-            <div class="relative bg-slate-900 p-4 rounded-xl border border-slate-800 font-mono text-xs text-slate-300 overflow-x-auto mb-6 max-h-60">
-                <pre id="embedCode"><code>&lt;script&gt;
-document.addEventListener("DOMContentLoaded", () => {
-    const phoneInput = document.querySelector('input[type="tel"]') || document.querySelector('input[name*="phone"]');
-    if (phoneInput) {
-        phoneInput.addEventListener("blur", async () => {
-            if (phoneInput.value.length > 5) {
-                await fetch('YOUR_DEPLOYED_APP_URL/api/capture', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        store: window.location.hostname,
-                        phone: phoneInput.value,
-                        value: document.querySelector('[class*="total"], [id*="total"]')?.innerText || "$49.00"
-                    })
-                });
-            }
-        });
-    }
-});
-&lt;/script&gt;</code></pre>
-                <button onclick="copyCode()" class="absolute top-3 right-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs px-2.5 py-1.5 rounded-lg font-sans transition-all flex items-center gap-1.5 cursor-pointer">
-                    <i class="fa-regular fa-copy"></i> Copy Code
-                </button>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wider">Password</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500"><i class="fa-solid fa-lock"></i></span>
+                    <input type="password" id="auth-password" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all">
+                </div>
             </div>
-            <div class="flex justify-end">
-                <button onclick="closeModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all cursor-pointer">Close</button>
-            </div>
-        </div>
+
+            <button type="submit" id="auth-submit-btn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-indigo-600/20 active:scale-[0.98] transition-all text-sm cursor-pointer mt-2">
+                Sign In to Account
+            </button>
+        </form>
+
+        <p id="status-msg" class="text-center text-xs mt-4 hidden font-medium"></p>
     </div>
 
     <script>
-        const SUPABASE_URL = "https://fhmrlrnolpcjkpyhnvle.supabase.co"; 
-        const SUPABASE_KEY = "sb_publishable_22KwKcRawWIjYqUYHm1Pig_R6cqb4Wj"; 
-        
-        let supabase;
-        try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        } catch (err) {
-            console.error("Initialization failed:", err);
-        }
+        // Initialize Supabase configuration
+        const SUPABASE_URL = "YOUR_SUPABASE_URL"; 
+        const SUPABASE_KEY = "YOUR_SUPABASE_ANON_KEY"; 
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        function switchTab(mode) {
-            const tabLogin = document.getElementById('tabLogin');
-            const tabSignup = document.getElementById('tabSignup');
-            const title = document.getElementById('authTitle');
-            const subtitle = document.getElementById('authSubtitle');
-            const btnLogin = document.getElementById('btnLogin');
-            const btnSignup = document.getElementById('btnSignup');
+        // Keep track of current action state
+        let currentMode = 'login';
+
+        // Tab Switch Control Module
+        function switchAuthMode(mode) {
+            currentMode = mode;
+            
+            const tabLogin = document.getElementById('tab-login');
+            const tabSignup = document.getElementById('tab-signup');
+            const title = document.getElementById('auth-title');
+            const subtitle = document.getElementById('auth-subtitle');
+            const submitBtn = document.getElementById('auth-submit-btn');
+            const statusMsg = document.getElementById('status-msg');
+
+            // Hide status messages on switch
+            statusMsg.classList.add('hidden');
 
             if (mode === 'login') {
-                tabLogin.className = "w-1/2 pb-3 text-sm font-semibold border-b-2 border-indigo-500 text-indigo-400 transition-all cursor-pointer text-center";
-                tabSignup.className = "w-1/2 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all cursor-pointer text-center";
+                // UI styles updates for Log In Tab Active
+                tabLogin.className = "flex-1 pb-3 text-center text-sm font-semibold transition-all border-b-2 border-indigo-500 text-white cursor-pointer";
+                tabSignup.className = "flex-1 pb-3 text-center text-sm font-semibold transition-all border-b-2 border-transparent text-slate-400 hover:text-slate-200 cursor-pointer";
+                
                 title.innerText = "Welcome Back";
                 subtitle.innerText = "Enter your email and password to access your dashboard.";
-                btnLogin.classList.remove('hidden');
-                btnSignup.classList.add('hidden');
+                submitBtn.innerText = "Sign In to Account";
             } else {
-                tabLogin.className = "w-1/2 pb-3 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all cursor-pointer text-center";
-                tabSignup.className = "w-1/2 pb-3 text-sm font-semibold border-b-2 border-emerald-500 text-emerald-400 transition-all cursor-pointer text-center";
-                title.innerText = "Get Started Today";
-                subtitle.innerText = "Create your account credentials to register a new store link.";
-                btnLogin.classList.add('hidden');
-                btnSignup.classList.remove('hidden');
+                // UI styles updates for Create Account Tab Active
+                tabLogin.className = "flex-1 pb-3 text-center text-sm font-semibold transition-all border-b-2 border-transparent text-slate-400 hover:text-slate-200 cursor-pointer";
+                tabSignup.className = "flex-1 pb-3 text-center text-sm font-semibold transition-all border-b-2 border-indigo-500 text-white cursor-pointer";
+                
+                title.innerText = "Get Started Free";
+                subtitle.innerText = "Set up your brand store dashboard account in seconds.";
+                submitBtn.innerText = "Create Free Account";
             }
         }
 
-        async function handleLogin() {
-            const email = document.getElementById('authEmail').value.trim();
-            const password = document.getElementById('authPassword').value;
-            if (!email || !password) { alert('Please enter both your email and password.'); return; }
-
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-            if (error) { alert('Login Failed: ' + error.message); return; }
+        // Processing Authorization Pipeline Execution
+        async function handleAuth(event) {
+            event.preventDefault();
             
-            checkUser();
-        }
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const statusMsg = document.getElementById('status-msg');
+            const submitBtn = document.getElementById('auth-submit-btn');
 
-        async function handleSignup() {
-            const email = document.getElementById('authEmail').value.trim();
-            const password = document.getElementById('authPassword').value;
-            if (!email || !password) { alert('Please enter an email and create a password.'); return; }
+            // Set Loading state
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Processing...";
+            statusMsg.classList.add('hidden');
 
-            const { data, error } = await supabase.auth.signUp({ email, password });
-            if (error) { alert('Signup Failed: ' + error.message); return; }
-            
-            alert('Registration Successful! Welcome to CartRescue.');
-            checkUser();
-        }
-
-        async function checkUser() {
-            if (!supabase) return;
-            const { data: { user }, error } = await supabase.auth.getUser();
-            if (user) {
-                document.getElementById('authOverlay').classList.add('hidden');
-                document.getElementById('userDisplay').innerText = user.email.split('@')[0];
-                document.getElementById('userInitial').innerText = user.email.charAt(0).toUpperCase();
-                fetchMetricsAndLeads();
+            if (currentMode === 'login') {
+                // Log in existing account via Supabase
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                
+                if (error) {
+                    showStatus(error.message, 'error');
+                } else {
+                    showStatus('Success! Redirecting to application...', 'success');
+                    // Route user forward to dashboard application file location
+                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
+                }
             } else {
-                document.getElementById('authOverlay').classList.remove('hidden');
+                // Sign up new user configuration entry point
+                const { data, error } = await supabase.auth.signUp({ email, password });
+                
+                if (error) {
+                    showStatus(error.message, 'error');
+                } else {
+                    showStatus('Registration successful! Please check your email inbox to verify.', 'success');
+                }
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.innerText = currentMode === 'login' ? "Sign In to Account" : "Create Free Account";
+        }
+
+        // Internal Status Notifications Helper
+        function showStatus(msg, type) {
+            const statusMsg = document.getElementById('status-msg');
+            statusMsg.innerText = msg;
+            statusMsg.classList.remove('hidden');
+            
+            if (type === 'error') {
+                statusMsg.className = "text-center text-xs mt-4 font-medium text-rose-400 bg-rose-500/10 py-2.5 px-4 rounded-xl border border-rose-500/20";
+            } else {
+                statusMsg.className = "text-center text-xs mt-4 font-medium text-emerald-400 bg-emerald-500/10 py-2.5 px-4 rounded-xl border border-emerald-500/20";
             }
         }
-
-        async function handleLogout() {
-            await supabase.auth.signOut();
-            checkUser();
-        }
-
-        async function fetchMetricsAndLeads() {
-            let { data: leads, error } = await supabase.from('leads').select('*').order('created_at', { ascending: false });
-            if (error) return;
-
-            const tableBody = document.getElementById('leads-table-body');
-            tableBody.innerHTML = '';
-            let totalRecovered = 0, totalSent = 0, totalPending = 0;
-
-            leads.forEach(lead => {
-                if (lead.status === 'Recovered') totalRecovered += Number(lead.cart_value || 0);
-                if (lead.status === 'Sent') totalSent += 1;
-                if (lead.status === 'Pending') totalPending += 1;
-
-                const row = document.createElement('tr');
-                row.className = "hover:bg-slate-900/40 transition-colors";
-                let badgeClass = lead.status === 'Recovered' ? "bg-emerald-500/10 text-emerald-400" : (lead.status === 'Sent' ? "bg-indigo-500/10 text-indigo-400" : "bg-amber-500/10 text-amber-400");
-
-                row.innerHTML = `
-                    <td class="p-4 font-mono font-semibold">${lead.customer_phone}</td>
-                    <td class="p-4 text-white">$${Number(lead.cart_value).toFixed(2)}</td>
-                    <td class="p-4"><span class="px-2.5 py-1 rounded-full text-xs font-bold ${badgeClass}">${lead.status}</span></td>
-                    <td class="p-4 text-xs text-slate-500">${new Date(lead.created_at).toLocaleString()}</td>
-                `;
-                tableBody.appendChild(row);
-            });
-
-            document.getElementById('stat-recovered').innerText = `$${totalRecovered.toFixed(2)}`;
-            document.getElementById('stat-sent').innerText = totalSent;
-            document.getElementById('stat-pending').innerText = totalPending;
-        }
-
-        function openModal() {
-            const el = document.getElementById('scriptModal');
-            el.classList.remove('hidden');
-            setTimeout(() => el.classList.remove('opacity-0'), 10);
-        }
-        function closeModal() {
-            const el = document.getElementById('scriptModal');
-            el.classList.add('opacity-0');
-            setTimeout(() => el.classList.add('hidden'), 300);
-        }
-        function copyCode() {
-            navigator.clipboard.writeText(document.getElementById('embedCode').innerText);
-            alert('Tracking script copied to clipboard!');
-        }
-
-        window.onload = checkUser;
     </script>
 </body>
 </html>
